@@ -14,10 +14,10 @@ uv tool install git+https://github.com/paunovic/pj
 
 ## What pj needs
 
-A `[tool.pj]` table in the pyproject.toml at or above the Pulumi project:
+A `[identity]` table in the pyproject.toml at or above the Pulumi project:
 
 ```toml
-[tool.pj]
+[identity]
 organization = "acme"
 domain = "acme.io"
 ```
@@ -29,7 +29,7 @@ environment `qa`.
 
 ## How pj runs a command
 
-From the environment and the `[tool.pj]` table pj derives the
+From the environment and the `[identity]` table pj derives the
 state bucket `s3://pulumi-state-<env>.<domain>`, the stack name,
 and the region, logs into the bucket, and forwards the remaining
 arguments to Pulumi. Commands that take a stack get `--stack <env>`
