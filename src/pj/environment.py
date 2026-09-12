@@ -7,7 +7,7 @@ from pathlib import Path
 
 
 class PJConfigError(Exception):
-    """raised when no pyproject.toml with a [identity] table is in scope."""
+    """raised when no pyproject.toml with a [organization] table is in scope."""
 
 
 @dataclass(frozen=True)
@@ -39,8 +39,8 @@ class Environment:
         return f"awskms://alias/pulumi-secrets?region={self.region or 'us-east-1'}"
 
 
-def find_identity_table(start: Path | None = None) -> dict:
-    # organization and domain live in [identity] of the nearest
+def find_organization_table(start: Path | None = None) -> dict:
+    # name and domain live in [organization] of the nearest
     # pyproject.toml at or above start; pyproject.toml files without
     # the table are skipped so sub-packages do not shadow the root
     directory: Path = start if start is not None else Path.cwd()
@@ -50,13 +50,13 @@ def find_identity_table(start: Path | None = None) -> dict:
             continue
         with open(pyproject, "rb") as fp:
             document = tomllib.load(fp)
-        identity_table = document.get("identity")
-        if isinstance(identity_table, dict):
-            return identity_table
+        organization_table = document.get("organization")
+        if isinstance(organization_table, dict):
+            return organization_table
 
     raise PJConfigError(
-        f"no pyproject.toml with a [identity] table found at or above "
-        f"{directory}; pj reads organization and domain from that table",
+        f"no pyproject.toml with a [organization] table found at or above "
+        f"{directory}; pj reads name and domain from that table",
     )
 
 
@@ -86,14 +86,14 @@ def resolve_environment(
     # the profile name IS the environment name; the aws config is
     # consulted only for the region
     environ = environ if environ is not None else os.environ
-    identity_table = find_identity_table()
+    organization_table = find_organization_table()
 
-    organization = identity_table.get("organization")
-    domain = identity_table.get("domain")
+    organization = organization_table.get("name")
+    domain = organization_table.get("domain")
     if not isinstance(organization, str) or not isinstance(domain, str):
         raise PJConfigError(
-            "[identity] needs string values for organization and domain; "
-            f"got organization={organization!r}, domain={domain!r}",
+            "[organization] needs string values for name and domain; "
+            f"got name={organization!r}, domain={domain!r}",
         )
 
     swaj_profile: str | None = environ.get("SWAJ_PROFILE")

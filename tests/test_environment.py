@@ -2,7 +2,7 @@ import pytest
 from pj.environment import (
     Environment,
     PJConfigError,
-    find_identity_table,
+    find_organization_table,
     read_profile_option,
     resolve_environment,
 )
@@ -133,45 +133,45 @@ def test_read_profile_option_reads_arbitrary_keys(tmp_path):
     assert read_profile_option("qa", "missing", aws_config) is None
 
 
-def test_find_identity_table_walks_up_to_the_nearest_table(tmp_path):
+def test_find_organization_table_walks_up_to_the_nearest_table(tmp_path):
     nested = tmp_path / "services" / "kms"
     nested.mkdir(parents=True)
     (tmp_path / "pyproject.toml").write_text(
-        "[identity]\n"
-        'organization = "squad"\n'
+        "[organization]\n"
+        'name = "squad"\n'
         'domain = "squad.com"\n',
     )
 
-    assert find_identity_table(nested) == {
-        "organization": "squad",
+    assert find_organization_table(nested) == {
+        "name": "squad",
         "domain": "squad.com",
     }
 
 
-def test_find_identity_table_skips_pyproject_without_the_table(tmp_path):
+def test_find_organization_table_skips_pyproject_without_the_table(tmp_path):
     nested = tmp_path / "python" / "pj"
     nested.mkdir(parents=True)
     (nested / "pyproject.toml").write_text('[project]\nname = "pj"\n')
     (tmp_path / "pyproject.toml").write_text(
-        "[identity]\n"
-        'organization = "squad"\n'
+        "[organization]\n"
+        'name = "squad"\n'
         'domain = "squad.com"\n',
     )
 
-    assert find_identity_table(nested) == {
-        "organization": "squad",
+    assert find_organization_table(nested) == {
+        "name": "squad",
         "domain": "squad.com",
     }
 
 
-def test_find_identity_table_errors_when_no_pyproject_has_the_table(tmp_path):
-    with pytest.raises(PJConfigError, match=r"\[identity\]"):
-        find_identity_table(tmp_path)
+def test_find_organization_table_errors_when_no_pyproject_has_the_table(tmp_path):
+    with pytest.raises(PJConfigError, match=r"\[organization\]"):
+        find_organization_table(tmp_path)
 
 
 def test_resolve_environment_rejects_incomplete_table(monkeypatch, tmp_path):
     monkeypatch.chdir(tmp_path)
-    (tmp_path / "pyproject.toml").write_text('[identity]\norganization = "squad"\n')
+    (tmp_path / "pyproject.toml").write_text('[organization]\nname = "squad"\n')
 
     with pytest.raises(PJConfigError, match="domain"):
         resolve_environment(environ={})

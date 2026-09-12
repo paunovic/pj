@@ -6,8 +6,8 @@ def pj_workspace(monkeypatch, tmp_path):
     workspace = tmp_path / "workspace"
     workspace.mkdir()
     (workspace / "pyproject.toml").write_text(
-        "[identity]\n"
-        'organization = "squad"\n'
+        "[organization]\n"
+        'name = "squad"\n'
         'domain = "squad.com"\n',
     )
     monkeypatch.chdir(workspace)

@@ -62,7 +62,7 @@ class PJ:
 
     def _dispatch_help(self) -> int:
         # passthrough keeps pulumi's usage authoritative instead of
-        # pj duplicating it; works without a [identity] table
+        # pj duplicating it; works without a [organization] table
         is_interactive: bool = sys.stdout.isatty()
 
         result = subprocess.run(

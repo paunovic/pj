@@ -41,8 +41,8 @@ def local_environment() -> Environment:
 
 def write_pj_pyproject(directory) -> None:
     (directory / "pyproject.toml").write_text(
-        "[identity]\n"
-        'organization = "squad"\n'
+        "[organization]\n"
+        'name = "squad"\n'
         'domain = "squad.com"\n',
     )
 
@@ -63,14 +63,14 @@ def test_run_returns_login_failure_exit_code(monkeypatch, tmp_path, capsys):
     assert "failed to login" in captured.err
 
 
-def test_run_reports_missing_identity_table(monkeypatch, tmp_path, capsys):
+def test_run_reports_missing_organization_table(monkeypatch, tmp_path, capsys):
     monkeypatch.chdir(tmp_path)
 
     return_code = PJ().run(args=["stack", "ls"])
 
     assert return_code == 1
     captured = capsys.readouterr()
-    assert "[identity]" in captured.err
+    assert "[organization]" in captured.err
 
 
 def test_run_pulumi_replays_original_when_stack_ls_fails(monkeypatch, capsys):
@@ -483,7 +483,7 @@ def test_bare_invocation_prints_pulumi_usage_without_config(
     ]
     captured = capsys.readouterr()
     assert "pulumi usage text" in captured.out
-    assert "[identity]" not in captured.err
+    assert "[organization]" not in captured.err
 
 
 def test_help_flag_prints_pulumi_usage_without_config(
@@ -502,7 +502,7 @@ def test_help_flag_prints_pulumi_usage_without_config(
     ]
     captured = capsys.readouterr()
     assert "pulumi usage text" in captured.out
-    assert "[identity]" not in captured.err
+    assert "[organization]" not in captured.err
 
 
 def test_short_help_flag_prints_pulumi_usage_without_config(
@@ -521,4 +521,4 @@ def test_short_help_flag_prints_pulumi_usage_without_config(
     ]
     captured = capsys.readouterr()
     assert "pulumi usage text" in captured.out
-    assert "[identity]" not in captured.err
+    assert "[organization]" not in captured.err
